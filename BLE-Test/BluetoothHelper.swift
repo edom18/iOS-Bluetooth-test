@@ -87,10 +87,6 @@ class BluetoothHelper: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
             print("<<< Set notification to [\(characteristic.uuid.uuidString)]>>>")
             
             peripheralToConnect?.setNotifyValue(true, for: characteristic)
-            
-//            print("<<< Try read values >>>")
-//            
-//            peripheralToConnect?.readValue(for: characteristic)
         }
     }
     
