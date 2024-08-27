@@ -71,10 +71,15 @@ class BluetoothHelper: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
             print("<<< On Service [\(service.uuid)] - [\(characteristic.uuid)]")
         }
         
+        
         if let characteristic = service.characteristics?.first {
-            print("<<< Try read values >>>")
+            print("<<< Set notification to [\(characteristic.uuid.uuidString)]>>>")
             
-            peripheralToConnect?.readValue(for: characteristic)
+            peripheralToConnect?.setNotifyValue(true, for: characteristic)
+            
+//            print("<<< Try read values >>>")
+//            
+//            peripheralToConnect?.readValue(for: characteristic)
         }
     }
     
@@ -86,5 +91,9 @@ class BluetoothHelper: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
         if let data = data {
             print("Data: [\(data)]")
         }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: (any Error)?) {
+        print("<<< Did write value for [\(characteristic.uuid.uuidString)] with value [\(characteristic.value!)]")
     }
 }
