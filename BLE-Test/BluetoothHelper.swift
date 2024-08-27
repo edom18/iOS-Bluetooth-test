@@ -1,5 +1,16 @@
 import CoreBluetooth
 
+extension Data {
+    var encodedHexadecimals: [UInt8] {
+        return self.withUnsafeBytes { pointer -> [UInt8] in
+            guard let address = pointer
+                .bindMemory(to: UInt8.self)
+                .baseAddress else { return [] }
+            return [UInt8](UnsafeBufferPointer(start: address, count: self.count))
+        }
+    }
+}
+
 class BluetoothHelper: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     private var centralManager: CBCentralManager! = nil
@@ -86,14 +97,23 @@ class BluetoothHelper: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
         print("<<< Received data >>>")
         
-        let data = NSString(data: characteristic.value!, encoding: NSUTF8StringEncoding)
-        
-        if let data = data {
-            print("Data: [\(data)]")
+        guard let data = characteristic.value else { return }
+
+        let intValue = data.withUnsafeBytes { bytes in
+            bytes.load(as: Int32.self)
         }
+        print("Data: [\(intValue)]")
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        print("<<< Did write value for [\(characteristic.uuid.uuidString)] with value [\(characteristic.value!)]")
+        
+        guard let data = characteristic.value else { return }
+        
+        let intValue = data.withUnsafeBytes { bytes in
+            bytes.load(as: Int32.self)
+        }
+        print("<<< Did write value for [\(characteristic.uuid.uuidString)] with value [\(intValue)]")
+
+//        print("<<< Did write value for [\(characteristic.uuid.uuidString)] with value [\(data.encodedHexadecimals)]")
     }
 }
